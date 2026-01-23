@@ -21,7 +21,7 @@ jobs:
 
       - name: Build collection
         run: |
-          cd jarmatys/vps_foundation
+          cd vps_foundation
           ansible-galaxy collection build
 
       - name: Get version from tag
@@ -31,7 +31,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: "jarmatys/vps_foundation/*.tar.gz"
+          files: "vps_foundation/*.tar.gz"
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
