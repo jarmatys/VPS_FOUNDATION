@@ -1,0 +1,37 @@
+---
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - supertokens_db_name is defined
+      - supertokens_api_keys is defined
+      - postgres_user is defined
+      - postgres_password is defined
+    fail_msg: "Required variables: supertokens_db_name, supertokens_api_keys, postgres_user, postgres_password"
+  when: supertokens_enabled | bool
+
+- name: Start SuperTokens container
+  community.docker.docker_container:
+    name: "{{ supertokens_container_name }}"
+    image: "{{ supertokens_image }}"
+    state: started
+    restart_policy: "{{ supertokens_restart_policy }}"
+    env:
+      POSTGRESQL_CONNECTION_URI: "postgresql://{{ postgres_user }}:{{ postgres_password }}@{{ supertokens_postgres_host }}:{{ supertokens_postgres_port }}/{{ supertokens_db_name }}"
+      API_KEYS: "{{ supertokens_api_keys }}"
+    networks:
+      - name: "{{ supertokens_network }}"
+  when: supertokens_enabled
+  tags: supertokens
+
+- name: Wait for SuperTokens to be ready
+  ansible.builtin.uri:
+    url: "http://{{ supertokens_container_name }}:3567/hello"
+    method: GET
+    status_code: 200
+  register: supertokens_health
+  until: supertokens_health.status == 200
+  retries: 30
+  delay: 5
+  when: supertokens_enabled
+  ignore_errors: true
+  tags: supertokens

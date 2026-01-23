@@ -1,0 +1,44 @@
+---
+- name: Backup original SSH config
+  ansible.builtin.copy:
+    src: /etc/ssh/sshd_config
+    dest: /etc/ssh/sshd_config.backup
+    remote_src: true
+    mode: '0644'
+  tags: ssh
+
+- name: Disable password authentication in main SSH config
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^#?PasswordAuthentication'
+    line: 'PasswordAuthentication no'
+    backup: true
+  notify: restart ssh
+  tags: ssh
+
+- name: Disable password auth in cloud-init ssh config
+  ansible.builtin.lineinfile:
+    path: /etc/ssh/sshd_config.d/50-cloud-init.conf
+    regexp: '^[#\s]*PasswordAuthentication\s+'
+    line: 'PasswordAuthentication no'
+    state: present
+    backup: true
+  notify: restart ssh
+  tags: ssh
+  ignore_errors: true
+
+- name: Configure SSH security settings
+  ansible.builtin.template:
+    src: sshd_security.conf.j2
+    dest: /etc/ssh/sshd_config.d/00-security.conf
+    backup: true
+    mode: '0644'
+  notify: restart ssh
+  tags: ssh
+
+- name: Ensure SSH service is enabled and running
+  ansible.builtin.systemd:
+    name: ssh
+    enabled: true
+    state: started
+  tags: ssh

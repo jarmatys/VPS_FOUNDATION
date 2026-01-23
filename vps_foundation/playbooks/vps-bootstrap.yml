@@ -1,0 +1,36 @@
+---
+- name: Bootstrap VPS Server
+  hosts: all
+  become: true
+  gather_facts: true
+
+  pre_tasks:
+    - name: Validate required variables
+      ansible.builtin.assert:
+        that:
+          - vps_app_user is defined
+          - vps_app_user | length > 0
+        fail_msg: "vps_app_user must be defined"
+        success_msg: "Required variables validated"
+
+    - name: Display bootstrap information
+      ansible.builtin.debug:
+        msg:
+          - "Bootstrapping VPS Server"
+          - "App User: {{ vps_app_user }}"
+          - "Timezone: {{ vps_timezone | default('UTC') }}"
+
+  roles:
+    - role: jarmatys.vps_foundation.system_hardening
+      tags: [system, hardening]
+
+    - role: jarmatys.vps_foundation.docker_engine
+      tags: [docker]
+
+  post_tasks:
+    - name: Bootstrap completed
+      ansible.builtin.debug:
+        msg:
+          - "VPS Bootstrap completed successfully!"
+          - "User '{{ vps_app_user }}' created with Docker access"
+          - "SSH hardened, firewall enabled, fail2ban configured"

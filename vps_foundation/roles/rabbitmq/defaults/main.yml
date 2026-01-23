@@ -1,0 +1,11 @@
+---
+rabbitmq_enabled: true
+rabbitmq_container_name: rabbitmq
+rabbitmq_image: rabbitmq:3-management
+rabbitmq_restart_policy: always
+
+rabbitmq_user: "{{ rabbitmq_user }}"
+rabbitmq_password: "{{ rabbitmq_password }}"
+
+rabbitmq_network: app-network
+rabbitmq_extra_env: {}

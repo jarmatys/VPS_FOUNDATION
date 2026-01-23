@@ -1,0 +1,44 @@
+---
+- name: Install Docker dependencies
+  ansible.builtin.apt:
+    name: "{{ docker_dependencies }}"
+    state: present
+    update_cache: true
+  tags: docker
+
+- name: Create keyrings directory
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+  tags: docker
+
+- name: Download Docker GPG key
+  ansible.builtin.get_url:
+    url: "{{ docker_apt_key_url }}"
+    dest: /etc/apt/keyrings/docker.asc
+    mode: '0644'
+  tags: docker
+
+- name: Add Docker repository
+  ansible.builtin.apt_repository:
+    repo: "{{ docker_apt_repository }}"
+    state: present
+    update_cache: true
+  tags: docker
+
+- name: Install Docker packages
+  ansible.builtin.apt:
+    name: "{{ docker_packages }}"
+    state: present
+    update_cache: true
+  notify:
+    - restart docker
+  tags: docker
+
+- name: Ensure Docker service is enabled and started
+  ansible.builtin.systemd:
+    name: docker
+    enabled: "{{ docker_service_enabled }}"
+    state: "{{ docker_service_state }}"
+  tags: docker

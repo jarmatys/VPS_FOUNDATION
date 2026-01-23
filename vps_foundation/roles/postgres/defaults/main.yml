@@ -1,0 +1,20 @@
+---
+postgres_enabled: true
+postgres_container_name: postgres
+postgres_image: postgres:16-alpine
+postgres_restart_policy: always
+
+postgres_db: "{{ postgres_db }}"
+postgres_user: "{{ postgres_user }}"
+postgres_password: "{{ postgres_password }}"
+
+postgres_data_dir: /opt/services/postgres/data
+postgres_network: app-network
+
+postgres_extra_env: {}
+
+pgadmin_enabled: false
+pgadmin_container_name: pgadmin
+pgadmin_image: dpage/pgadmin4:latest
+pgadmin_email: "{{ pgadmin_email | default('admin@example.com') }}"
+pgadmin_password: "{{ pgadmin_password | default('admin') }}"

@@ -1,0 +1,82 @@
+---
+- name: VPS Deploy Infrastructure
+  hosts: all
+  become: true
+  gather_facts: true
+
+  vars:
+    services_postgres_enabled: true
+    services_rabbitmq_enabled: true
+    services_caddy_enabled: true
+    services_seq_enabled: false
+    services_portainer_enabled: false
+    services_supertokens_enabled: false
+    services_network: app-network
+
+  pre_tasks:
+    - name: Ensure Docker network exists
+      community.docker.docker_network:
+        name: "{{ services_network }}"
+        driver: bridge
+        state: present
+      tags: always
+
+    - name: Display services configuration
+      ansible.builtin.debug:
+        msg:
+          - "Deploying VPS Infrastructure"
+          - "Network: {{ services_network }}"
+          - "PostgreSQL: {{ services_postgres_enabled }}"
+          - "RabbitMQ: {{ services_rabbitmq_enabled }}"
+          - "Caddy: {{ services_caddy_enabled }}"
+          - "Seq: {{ services_seq_enabled }}"
+          - "Portainer: {{ services_portainer_enabled }}"
+          - "SuperTokens: {{ services_supertokens_enabled }}"
+
+  roles:
+    - role: jarmatys.vps_foundation.postgres
+      vars:
+        postgres_enabled: "{{ services_postgres_enabled }}"
+        postgres_network: "{{ services_network }}"
+      when: services_postgres_enabled
+      tags: [postgres, database]
+
+    - role: jarmatys.vps_foundation.rabbitmq
+      vars:
+        rabbitmq_enabled: "{{ services_rabbitmq_enabled }}"
+        rabbitmq_network: "{{ services_network }}"
+      when: services_rabbitmq_enabled
+      tags: [rabbitmq, messaging]
+
+    - role: jarmatys.vps_foundation.caddy
+      vars:
+        caddy_enabled: "{{ services_caddy_enabled }}"
+        caddy_network: "{{ services_network }}"
+      when: services_caddy_enabled
+      tags: [caddy, proxy]
+
+    - role: jarmatys.vps_foundation.seq
+      vars:
+        seq_enabled: "{{ services_seq_enabled }}"
+        seq_network: "{{ services_network }}"
+      when: services_seq_enabled
+      tags: [seq, logging]
+
+    - role: jarmatys.vps_foundation.portainer
+      vars:
+        portainer_enabled: "{{ services_portainer_enabled }}"
+        portainer_network: "{{ services_network }}"
+      when: services_portainer_enabled
+      tags: [portainer, management]
+
+    - role: jarmatys.vps_foundation.supertokens
+      vars:
+        supertokens_enabled: "{{ services_supertokens_enabled }}"
+        supertokens_network: "{{ services_network }}"
+      when: services_supertokens_enabled
+      tags: [supertokens, auth]
+
+  post_tasks:
+    - name: Services deployment completed
+      ansible.builtin.debug:
+        msg: "VPS Infrastructure deployed successfully!"

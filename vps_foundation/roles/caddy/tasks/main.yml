@@ -1,0 +1,64 @@
+---
+- name: Validate Cloudflare token when enabled
+  ansible.builtin.assert:
+    that:
+      - caddy_cloudflare_token is defined
+      - caddy_cloudflare_token | length > 0
+    fail_msg: "caddy_cloudflare_token is required when caddy_use_cloudflare is true"
+  when:
+    - caddy_enabled | bool
+    - caddy_use_cloudflare | bool
+
+- name: Set Caddy image based on Cloudflare usage
+  ansible.builtin.set_fact:
+    caddy_final_image: "{{ caddy_image_cloudflare if caddy_use_cloudflare else caddy_image }}"
+  tags: caddy
+
+- name: Create Caddy config directory
+  ansible.builtin.file:
+    path: /opt/services/caddy/config
+    state: directory
+    mode: '0755'
+  when: caddy_config_path != ""
+  tags: caddy
+
+- name: Copy Caddyfile
+  ansible.builtin.copy:
+    src: "{{ caddy_config_path }}"
+    dest: /opt/services/caddy/config/Caddyfile
+    mode: '0644'
+  when: caddy_config_path != ""
+  tags: caddy
+
+- name: Start Caddy container
+  community.docker.docker_container:
+    name: "{{ caddy_container_name }}"
+    image: "{{ caddy_final_image }}"
+    state: started
+    restart_policy: "{{ caddy_restart_policy }}"
+    ports: "{{ caddy_ports }}"
+    env: "{{ {'CLOUDFLARE_API_TOKEN': caddy_cloudflare_token} | combine(caddy_extra_env) if caddy_use_cloudflare else caddy_extra_env }}"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+      - /opt/services/caddy/config/Caddyfile:/etc/caddy/Caddyfile:ro
+    networks:
+      - name: "{{ caddy_network }}"
+  when: caddy_enabled and caddy_config_path != ""
+  tags: caddy
+
+- name: Start Caddy container (without custom config)
+  community.docker.docker_container:
+    name: "{{ caddy_container_name }}"
+    image: "{{ caddy_final_image }}"
+    state: started
+    restart_policy: "{{ caddy_restart_policy }}"
+    ports: "{{ caddy_ports }}"
+    env: "{{ {'CLOUDFLARE_API_TOKEN': caddy_cloudflare_token} | combine(caddy_extra_env) if caddy_use_cloudflare else caddy_extra_env }}"
+    volumes:
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - name: "{{ caddy_network }}"
+  when: caddy_enabled and caddy_config_path == ""
+  tags: caddy

@@ -1,0 +1,66 @@
+---
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - postgres_db is defined
+      - postgres_user is defined
+      - postgres_password is defined
+    fail_msg: "Required variables: postgres_db, postgres_user, postgres_password"
+  when: postgres_enabled | bool
+
+- name: Create PostgreSQL data directory
+  ansible.builtin.file:
+    path: "{{ postgres_data_dir }}"
+    state: directory
+    mode: '0755'
+  tags: postgres
+
+- name: Start PostgreSQL container
+  community.docker.docker_container:
+    name: "{{ postgres_container_name }}"
+    image: "{{ postgres_image }}"
+    state: started
+    restart_policy: "{{ postgres_restart_policy }}"
+    env:
+      POSTGRES_DB: "{{ postgres_db }}"
+      POSTGRES_USER: "{{ postgres_user }}"
+      POSTGRES_PASSWORD: "{{ postgres_password }}"
+    volumes:
+      - "{{ postgres_data_dir }}:/var/lib/postgresql/data"
+    networks:
+      - name: "{{ postgres_network }}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U {{ postgres_user }} -d {{ postgres_db }}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  when: postgres_enabled
+  tags: postgres
+
+- name: Wait for PostgreSQL to be ready
+  community.docker.docker_container_info:
+    name: "{{ postgres_container_name }}"
+  register: postgres_info
+  until: postgres_info.container.State.Health.Status == "healthy"
+  retries: 30
+  delay: 5
+  when: postgres_enabled
+  tags: postgres
+
+- name: Start PgAdmin container
+  community.docker.docker_container:
+    name: "{{ pgadmin_container_name }}"
+    image: "{{ pgadmin_image }}"
+    state: started
+    restart_policy: "{{ postgres_restart_policy }}"
+    env:
+      PGADMIN_DEFAULT_EMAIL: "{{ pgadmin_email }}"
+      PGADMIN_DEFAULT_PASSWORD: "{{ pgadmin_password }}"
+      PGADMIN_CONFIG_WTF_CSRF_ENABLED: "False"
+      PGADMIN_CONFIG_SERVER_MODE: "True"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - name: "{{ postgres_network }}"
+  when: pgadmin_enabled
+  tags: postgres

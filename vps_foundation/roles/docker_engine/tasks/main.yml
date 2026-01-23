@@ -1,0 +1,38 @@
+---
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - vps_app_user is defined
+      - vps_app_user | length > 0
+    fail_msg: "Required variable 'vps_app_user' must be defined"
+
+- name: Include Docker installation tasks
+  ansible.builtin.include_tasks: install.yml
+  tags:
+    - docker
+    - install
+
+- name: Include Docker daemon configuration tasks
+  ansible.builtin.include_tasks: configure.yml
+  tags:
+    - docker
+    - configure
+
+- name: Include Docker Compose installation tasks
+  ansible.builtin.include_tasks: compose.yml
+  tags:
+    - docker
+    - compose
+
+- name: Include user management tasks
+  ansible.builtin.include_tasks: users.yml
+  tags:
+    - docker
+    - users
+
+- name: Include network setup tasks
+  ansible.builtin.include_tasks: networks.yml
+  tags:
+    - docker
+    - networks
+  when: docker_networks | length > 0

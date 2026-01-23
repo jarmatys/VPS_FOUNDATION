@@ -1,0 +1,20 @@
+---
+galaxy_info:
+  role_name: docker_engine
+  author: Jarmatys
+  description: Docker and Docker Compose installation for Ubuntu 22.04+
+  license: MIT
+  min_ansible_version: "2.14"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+        - noble
+  galaxy_tags:
+    - docker
+    - containers
+    - ubuntu
+    - vps
+
+dependencies:
+  - role: jarmatys.vps_foundation.system_hardening

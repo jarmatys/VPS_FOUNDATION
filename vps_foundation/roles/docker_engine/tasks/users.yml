@@ -1,0 +1,26 @@
+---
+- name: Add users to docker group
+  ansible.builtin.user:
+    name: "{{ item }}"
+    groups: docker
+    append: true
+  loop: "{{ docker_users + docker_additional_users }}"
+  tags: docker
+
+- name: Reset SSH connection to allow user changes to take effect
+  ansible.builtin.meta: reset_connection
+  tags: docker
+
+- name: Verify user can run Docker commands
+  ansible.builtin.command: docker ps
+  become: true
+  become_user: "{{ vps_app_user }}"
+  register: docker_user_test
+  changed_when: false
+  tags: docker
+
+- name: Display Docker user test result
+  ansible.builtin.debug:
+    msg: "User '{{ vps_app_user }}' can successfully run Docker commands"
+  when: docker_user_test.rc == 0
+  tags: docker

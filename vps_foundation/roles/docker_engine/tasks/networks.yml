@@ -1,0 +1,14 @@
+---
+- name: Create Docker networks
+  community.docker.docker_network:
+    name: "{{ item.name }}"
+    driver: "{{ item.driver | default('bridge') }}"
+    state: present
+  loop: "{{ docker_networks }}"
+  tags: networks
+
+- name: Display created networks
+  ansible.builtin.debug:
+    msg: "Created Docker network: {{ item.name }}"
+  loop: "{{ docker_networks }}"
+  tags: networks

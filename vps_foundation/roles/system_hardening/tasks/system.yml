@@ -1,0 +1,57 @@
+---
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+  tags: system
+
+- name: Upgrade all packages
+  ansible.builtin.apt:
+    upgrade: dist
+    autoremove: true
+    autoclean: true
+  tags: system
+
+- name: Install base packages
+  ansible.builtin.apt:
+    name: "{{ vps_base_packages + vps_additional_packages }}"
+    state: present
+  tags: system
+
+- name: Set timezone
+  community.general.timezone:
+    name: "{{ vps_timezone }}"
+  notify: restart cron
+  tags: system
+
+- name: Set locale
+  community.general.locale_gen:
+    name: "{{ vps_locale }}"
+    state: present
+  tags: system
+
+- name: Configure system locale
+  ansible.builtin.lineinfile:
+    path: /etc/default/locale
+    regexp: '^LANG='
+    line: 'LANG={{ vps_locale }}'
+    create: true
+    mode: '0644'
+  tags: system
+
+- name: Ensure /etc/environment exists
+  ansible.builtin.file:
+    path: /etc/environment
+    state: touch
+    mode: '0644'
+  tags: system
+
+- name: Set system-wide environment variables
+  ansible.builtin.lineinfile:
+    path: /etc/environment
+    regexp: '^{{ item.key }}='
+    line: '{{ item.key }}={{ item.value }}'
+  loop:
+    - { key: 'LANG', value: '{{ vps_locale }}' }
+    - { key: 'LC_ALL', value: '{{ vps_locale }}' }
+  tags: system

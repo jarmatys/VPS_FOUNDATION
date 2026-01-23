@@ -1,0 +1,44 @@
+---
+- name: Create Docker configuration directory
+  ansible.builtin.file:
+    path: /etc/docker
+    state: directory
+    mode: '0755'
+  tags: docker
+
+- name: Configure Docker daemon
+  ansible.builtin.template:
+    src: daemon.json.j2
+    dest: /etc/docker/daemon.json
+    backup: true
+    mode: '0644'
+  notify:
+    - restart docker
+  tags: docker
+
+- name: Ensure Docker service is restarted if config changed
+  ansible.builtin.meta: flush_handlers
+  tags: docker
+
+- name: Verify Docker installation
+  ansible.builtin.command: docker --version
+  register: docker_version_output
+  changed_when: false
+  tags: docker
+
+- name: Display Docker version
+  ansible.builtin.debug:
+    var: docker_version_output.stdout
+  tags: docker
+
+- name: Test Docker installation
+  ansible.builtin.command: docker run --rm hello-world
+  register: docker_test
+  changed_when: false
+  tags: docker
+
+- name: Display Docker test result
+  ansible.builtin.debug:
+    msg: "Docker installation test successful"
+  when: docker_test.rc == 0
+  tags: docker

@@ -1,0 +1,48 @@
+---
+- name: Check if docker-compose-plugin is already installed
+  ansible.builtin.command: docker compose version
+  register: docker_compose_check
+  changed_when: false
+  failed_when: false
+  tags: compose
+
+- name: Get latest Docker Compose version from GitHub
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/docker/compose/releases/latest
+    return_content: true
+  register: compose_latest_release
+  when: docker_compose_version == ""
+  tags: compose
+
+- name: Set Docker Compose version
+  ansible.builtin.set_fact:
+    compose_version: "{{ docker_compose_version if docker_compose_version != '' else compose_latest_release.json.tag_name }}"
+  when: docker_compose_check.rc != 0
+  tags: compose
+
+- name: Install Docker Compose (standalone) if plugin not available
+  ansible.builtin.get_url:
+    url: "https://github.com/docker/compose/releases/download/{{ compose_version }}/docker-compose-{{ ansible_system }}-{{ ansible_architecture }}"
+    dest: /usr/local/bin/docker-compose
+    mode: '0755'
+  when: docker_compose_check.rc != 0
+  tags: compose
+
+- name: Create docker-compose symlink
+  ansible.builtin.file:
+    src: /usr/local/bin/docker-compose
+    dest: /usr/bin/docker-compose
+    state: link
+  when: docker_compose_check.rc != 0
+  tags: compose
+
+- name: Verify Docker Compose installation
+  ansible.builtin.command: docker compose version
+  register: docker_compose_version_output
+  changed_when: false
+  tags: compose
+
+- name: Display Docker Compose version
+  ansible.builtin.debug:
+    var: docker_compose_version_output.stdout
+  tags: compose

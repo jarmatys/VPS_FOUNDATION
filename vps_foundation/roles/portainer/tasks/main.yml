@@ -1,0 +1,15 @@
+---
+- name: Start Portainer container
+  community.docker.docker_container:
+    name: "{{ portainer_container_name }}"
+    image: "{{ portainer_image }}"
+    state: started
+    restart_policy: "{{ portainer_restart_policy }}"
+    env: "{{ {'VIRTUAL_HOST': portainer_vhost, 'VIRTUAL_PORT': '9000'} | combine(portainer_extra_env) if portainer_vhost else portainer_extra_env }}"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - name: "{{ portainer_network }}"
+  when: portainer_enabled
+  tags: portainer

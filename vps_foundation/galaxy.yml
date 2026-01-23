@@ -1,0 +1,33 @@
+namespace: jarmatys
+name: vps_foundation
+version: 1.0.0
+readme: README.md
+authors:
+  - Jarmatys
+
+description: Foundation roles for VPS setup - system hardening, Docker, and common services (PostgreSQL, RabbitMQ, Caddy, Seq, Portainer)
+
+license:
+  - MIT
+
+tags:
+  - vps
+  - docker
+  - ubuntu
+  - infrastructure
+  - devops
+  - postgres
+  - rabbitmq
+  - caddy
+
+dependencies:
+  community.docker: ">=3.0.0"
+  community.general: ">=7.0.0"
+  ansible.posix: ">=1.5.0"
+
+repository: https://github.com/jarmatys/ansible-vps-foundation
+
+build_ignore:
+  - .github
+  - .gitignore
+  - "*.tar.gz"

@@ -1,0 +1,16 @@
+---
+- name: Start Seq container
+  community.docker.docker_container:
+    name: "{{ seq_container_name }}"
+    image: "{{ seq_image }}"
+    state: started
+    restart_policy: "{{ seq_restart_policy }}"
+    env:
+      ACCEPT_EULA: "{{ 'Y' if seq_accept_eula else 'N' }}"
+      SEQ_FIRSTRUN_NOAUTHENTICATION: "{{ 'true' if seq_first_run_no_auth else 'false' }}"
+    volumes:
+      - seq_data:/data
+    networks:
+      - name: "{{ seq_network }}"
+  when: seq_enabled
+  tags: seq

@@ -1,0 +1,13 @@
+---
+supertokens_enabled: true
+supertokens_container_name: supertokens-core
+supertokens_image: registry.supertokens.io/supertokens/supertokens-postgresql:10.1
+supertokens_restart_policy: always
+supertokens_network: app-network
+
+supertokens_db_name: "{{ supertokens_db_name }}"
+supertokens_api_keys: "{{ supertokens_api_keys }}"
+supertokens_postgres_host: postgres
+supertokens_postgres_port: 5432
+postgres_user: "{{ postgres_user }}"
+postgres_password: "{{ postgres_password }}"

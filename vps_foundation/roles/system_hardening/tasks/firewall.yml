@@ -1,0 +1,49 @@
+---
+- name: Reset UFW to defaults
+  community.general.ufw:
+    state: reset
+  tags: firewall
+
+- name: Configure UFW defaults
+  community.general.ufw:
+    direction: "{{ item.direction }}"
+    policy: "{{ item.policy }}"
+  loop:
+    - { direction: 'incoming', policy: '{{ vps_firewall_default_incoming }}' }
+    - { direction: 'outgoing', policy: '{{ vps_firewall_default_outgoing }}' }
+  tags: firewall
+
+- name: Configure base firewall rules
+  community.general.ufw:
+    rule: "{{ item.rule }}"
+    port: "{{ item.port }}"
+    proto: "{{ item.proto | default('tcp') }}"
+  loop: "{{ vps_firewall_rules }}"
+  tags: firewall
+
+- name: Configure additional firewall rules
+  community.general.ufw:
+    rule: "{{ item.rule }}"
+    port: "{{ item.port }}"
+    proto: "{{ item.proto | default('tcp') }}"
+  loop: "{{ vps_firewall_additional_rules }}"
+  when: vps_firewall_additional_rules | length > 0
+  tags: firewall
+
+- name: Enable UFW
+  community.general.ufw:
+    state: enabled
+    logging: 'on'
+  when: vps_firewall_enabled | bool
+  tags: firewall
+
+- name: Check UFW status
+  ansible.builtin.command: ufw status verbose
+  register: ufw_status
+  changed_when: false
+  tags: firewall
+
+- name: Display UFW status
+  ansible.builtin.debug:
+    var: ufw_status.stdout_lines
+  tags: firewall

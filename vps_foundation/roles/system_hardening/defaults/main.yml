@@ -1,0 +1,64 @@
+---
+vps_app_user: "{{ vps_app_user }}"
+vps_app_group: "{{ vps_app_group | default(vps_app_user) }}"
+vps_app_user_shell: /bin/bash
+vps_app_user_home: "/home/{{ vps_app_user }}"
+
+vps_timezone: "{{ vps_timezone | default('UTC') }}"
+vps_locale: "{{ vps_locale | default('en_US.UTF-8') }}"
+
+vps_ssh_port: "{{ vps_ssh_port | default(22) }}"
+vps_ssh_permit_root_login: false
+vps_ssh_password_authentication: false
+vps_ssh_pubkey_authentication: true
+vps_ssh_x11_forwarding: false
+vps_ssh_client_alive_interval: 300
+vps_ssh_client_alive_count_max: 2
+vps_ssh_allowed_users:
+  - "{{ vps_app_user }}"
+
+vps_firewall_enabled: true
+vps_firewall_default_incoming: deny
+vps_firewall_default_outgoing: allow
+vps_firewall_rules:
+  - { rule: "allow", port: "{{ vps_ssh_port }}", proto: "tcp" }
+  - { rule: "allow", port: "80", proto: "tcp" }
+  - { rule: "allow", port: "443", proto: "tcp" }
+vps_firewall_additional_rules: []
+
+vps_fail2ban_enabled: true
+vps_fail2ban_default_bantime: 3600
+vps_fail2ban_default_findtime: 600
+vps_fail2ban_default_maxretry: 5
+vps_fail2ban_jails:
+  sshd:
+    enabled: true
+    port: "{{ vps_ssh_port }}"
+    filter: sshd
+    logpath: /var/log/auth.log
+    maxretry: 3
+    bantime: 7200
+
+vps_base_packages:
+  - curl
+  - wget
+  - git
+  - ufw
+  - fail2ban
+  - htop
+  - tree
+  - rsync
+  - unzip
+  - vim
+  - nano
+  - net-tools
+  - software-properties-common
+  - apt-transport-https
+  - ca-certificates
+  - gnupg
+  - lsb-release
+  - cron
+vps_additional_packages: []
+
+vps_auto_updates_enabled: false
+vps_unattended_upgrades_enabled: false

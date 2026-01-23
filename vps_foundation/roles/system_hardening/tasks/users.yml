@@ -1,0 +1,44 @@
+---
+- name: Create application group
+  ansible.builtin.group:
+    name: "{{ vps_app_group }}"
+    state: present
+  tags: users
+
+- name: Create application user
+  ansible.builtin.user:
+    name: "{{ vps_app_user }}"
+    group: "{{ vps_app_group }}"
+    groups: sudo
+    append: true
+    shell: "{{ vps_app_user_shell }}"
+    home: "{{ vps_app_user_home }}"
+    create_home: true
+    state: present
+  tags: users
+
+- name: Create .ssh directory for application user
+  ansible.builtin.file:
+    path: "{{ vps_app_user_home }}/.ssh"
+    state: directory
+    owner: "{{ vps_app_user }}"
+    group: "{{ vps_app_group }}"
+    mode: '0700'
+  tags: users
+
+- name: Copy SSH authorized keys from root (if exists)
+  ansible.builtin.command: cp /root/.ssh/authorized_keys {{ vps_app_user_home }}/.ssh/authorized_keys
+  args:
+    creates: "{{ vps_app_user_home }}/.ssh/authorized_keys"
+  ignore_errors: true
+  notify: fix ssh key permissions
+  tags: users
+
+- name: Set up passwordless sudo for application user
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers.d/{{ vps_app_user }}
+    line: '{{ vps_app_user }} ALL=(ALL) NOPASSWD:ALL'
+    create: true
+    validate: 'visudo -cf %s'
+    mode: '0440'
+  tags: users

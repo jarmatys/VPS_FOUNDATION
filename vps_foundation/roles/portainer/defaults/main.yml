@@ -1,0 +1,10 @@
+---
+portainer_enabled: true
+portainer_container_name: portainer
+portainer_image: portainer/portainer-ce:latest
+portainer_restart_policy: always
+
+portainer_network: app-network
+portainer_vhost: ""
+
+portainer_extra_env: {}

@@ -1,0 +1,39 @@
+---
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - rabbitmq_user is defined
+      - rabbitmq_password is defined
+    fail_msg: "Required variables: rabbitmq_user, rabbitmq_password"
+  when: rabbitmq_enabled | bool
+
+- name: Start RabbitMQ container
+  community.docker.docker_container:
+    name: "{{ rabbitmq_container_name }}"
+    image: "{{ rabbitmq_image }}"
+    state: started
+    restart_policy: "{{ rabbitmq_restart_policy }}"
+    env:
+      RABBITMQ_DEFAULT_USER: "{{ rabbitmq_user }}"
+      RABBITMQ_DEFAULT_PASS: "{{ rabbitmq_password }}"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - name: "{{ rabbitmq_network }}"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  when: rabbitmq_enabled
+  tags: rabbitmq
+
+- name: Wait for RabbitMQ to be ready
+  community.docker.docker_container_info:
+    name: "{{ rabbitmq_container_name }}"
+  register: rabbitmq_info
+  until: rabbitmq_info.container.State.Health.Status == "healthy"
+  retries: 30
+  delay: 5
+  when: rabbitmq_enabled
+  tags: rabbitmq
