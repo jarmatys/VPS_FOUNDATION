@@ -1,0 +1,49 @@
+---
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - mssql_sa_password is defined
+      - mssql_sa_password | length >= 8
+    fail_msg: "Required variable: mssql_sa_password (min 8 characters with complexity requirements)"
+  when: mssql_enabled | bool
+
+- name: Create MSSQL data directory
+  ansible.builtin.file:
+    path: "{{ mssql_data_dir }}"
+    state: directory
+    mode: '0755'
+  tags: mssql
+
+- name: Build network list
+  ansible.builtin.set_fact:
+    mssql_networks: "{{ [{'name': mssql_network}] + (mssql_extra_networks | map('community.general.dict_kw', name='name') | list) }}"
+  tags: mssql
+
+- name: Start MSSQL container
+  community.docker.docker_container:
+    name: "{{ mssql_container_name }}"
+    image: "{{ mssql_image }}"
+    hostname: "{{ mssql_container_name }}"
+    state: started
+    restart_policy: "{{ mssql_restart_policy }}"
+    env: "{{ {'ACCEPT_EULA': 'Y', 'SA_PASSWORD': mssql_sa_password} | combine(mssql_extra_env) }}"
+    volumes:
+      - "{{ mssql_data_dir }}:/var/opt/mssql/data"
+    networks: "{{ mssql_networks }}"
+    healthcheck:
+      test: ["/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "{{ mssql_sa_password }}", "-Q", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  when: mssql_enabled
+  tags: mssql
+
+- name: Wait for MSSQL to be ready
+  community.docker.docker_container_info:
+    name: "{{ mssql_container_name }}"
+  register: mssql_info
+  until: mssql_info.container.State.Health.Status == "healthy"
+  retries: 30
+  delay: 5
+  when: mssql_enabled
+  tags: mssql

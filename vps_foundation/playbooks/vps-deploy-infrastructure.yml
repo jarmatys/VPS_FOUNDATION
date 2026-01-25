@@ -6,6 +6,7 @@
 
   vars:
     services_postgres_enabled: true
+    services_mssql_enabled: false
     services_rabbitmq_enabled: true
     services_caddy_enabled: true
     services_seq_enabled: false
@@ -27,6 +28,7 @@
           - "Deploying VPS Infrastructure"
           - "Network: {{ services_network }}"
           - "PostgreSQL: {{ services_postgres_enabled }}"
+          - "MSSQL: {{ services_mssql_enabled }}"
           - "RabbitMQ: {{ services_rabbitmq_enabled }}"
           - "Caddy: {{ services_caddy_enabled }}"
           - "Seq: {{ services_seq_enabled }}"
@@ -40,6 +42,13 @@
         postgres_network: "{{ services_network }}"
       when: services_postgres_enabled
       tags: [postgres, database]
+
+    - role: jarmatys.vps_foundation.mssql
+      vars:
+        mssql_enabled: "{{ services_mssql_enabled }}"
+        mssql_network: "{{ services_network }}"
+      when: services_mssql_enabled
+      tags: [mssql, database]
 
     - role: jarmatys.vps_foundation.rabbitmq
       vars:

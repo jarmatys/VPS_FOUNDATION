@@ -24,6 +24,7 @@ collections:
 | `system_hardening` | System hardening (SSH, firewall, fail2ban, users) |
 | `docker_engine` | Docker and Docker Compose installation |
 | `postgres` | PostgreSQL container deployment |
+| `mssql` | Microsoft SQL Server container deployment |
 | `rabbitmq` | RabbitMQ container with management UI |
 | `caddy` | Caddy reverse proxy (with optional Cloudflare) |
 | `seq` | Seq logging server |
@@ -51,6 +52,8 @@ collections:
     postgres_db: myproject_db
     postgres_user: myproject
     postgres_password: "{{ lookup('env', 'POSTGRES_PASSWORD') }}"
+    services_mssql_enabled: true
+    mssql_sa_password: "{{ lookup('env', 'MSSQL_SA_PASSWORD') }}"
     services_seq_enabled: true
     services_portainer_enabled: false
     services_supertokens_enabled: true
