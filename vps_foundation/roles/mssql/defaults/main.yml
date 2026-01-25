@@ -1,5 +1,5 @@
 ---
-mssql_enabled: true
+mssql_enabled: false
 mssql_container_name: mssql
 mssql_image: mcr.microsoft.com/mssql/server:2019-latest
 mssql_restart_policy: always

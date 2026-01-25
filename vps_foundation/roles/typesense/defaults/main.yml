@@ -1,0 +1,21 @@
+---
+typesense_enabled: false
+typesense_container_name: typesense
+typesense_image: typesense/typesense:0.25.1
+typesense_restart_policy: always
+
+typesense_api_key: ""
+
+typesense_data_dir: /opt/services/typesense/data
+typesense_network: app-network
+typesense_extra_networks: []
+
+typesense_enable_cors: true
+typesense_log_level: DEBUG
+typesense_memory_limit: 10g
+typesense_max_memory_ratio: "0.5"
+typesense_num_memory_shards: 2
+typesense_snapshot_interval: 1800
+typesense_cache_purge_strategy: background
+
+typesense_extra_command_args: []

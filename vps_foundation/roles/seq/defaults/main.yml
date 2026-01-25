@@ -1,5 +1,5 @@
 ---
-seq_enabled: true
+seq_enabled: false
 seq_container_name: seq
 seq_image: datalust/seq:latest
 seq_restart_policy: always

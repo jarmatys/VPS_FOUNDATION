@@ -5,11 +5,12 @@
   gather_facts: true
 
   vars:
-    services_postgres_enabled: true
+    services_postgres_enabled: false
     services_mssql_enabled: false
-    services_rabbitmq_enabled: true
-    services_caddy_enabled: true
+    services_rabbitmq_enabled: false
+    services_caddy_enabled: false
     services_seq_enabled: false
+    services_typesense_enabled: false
     services_portainer_enabled: false
     services_supertokens_enabled: false
     services_network: app-network
@@ -32,6 +33,7 @@
           - "RabbitMQ: {{ services_rabbitmq_enabled }}"
           - "Caddy: {{ services_caddy_enabled }}"
           - "Seq: {{ services_seq_enabled }}"
+          - "Typesense: {{ services_typesense_enabled }}"
           - "Portainer: {{ services_portainer_enabled }}"
           - "SuperTokens: {{ services_supertokens_enabled }}"
 
@@ -70,6 +72,13 @@
         seq_network: "{{ services_network }}"
       when: services_seq_enabled
       tags: [seq, logging]
+
+    - role: jarmatys.vps_foundation.typesense
+      vars:
+        typesense_enabled: "{{ services_typesense_enabled }}"
+        typesense_network: "{{ services_network }}"
+      when: services_typesense_enabled
+      tags: [typesense, search]
 
     - role: jarmatys.vps_foundation.portainer
       vars:

@@ -1,5 +1,5 @@
 ---
-postgres_enabled: true
+postgres_enabled: false
 postgres_container_name: postgres
 postgres_image: postgres:16-alpine
 postgres_restart_policy: always

@@ -1,5 +1,5 @@
 ---
-rabbitmq_enabled: true
+rabbitmq_enabled: false
 rabbitmq_container_name: rabbitmq
 rabbitmq_image: rabbitmq:3-management
 rabbitmq_restart_policy: always

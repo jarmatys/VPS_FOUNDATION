@@ -1,0 +1,49 @@
+---
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - typesense_api_key is defined
+      - typesense_api_key | length >= 8
+    fail_msg: "Required variable: typesense_api_key (min 8 characters)"
+  when: typesense_enabled | bool
+
+- name: Create Typesense data directory
+  ansible.builtin.file:
+    path: "{{ typesense_data_dir }}"
+    state: directory
+    mode: '0755'
+  tags: typesense
+
+- name: Build network list
+  ansible.builtin.set_fact:
+    typesense_networks: "{{ [{'name': typesense_network}] + (typesense_extra_networks | map('community.general.dict_kw', name='name') | list) }}"
+  tags: typesense
+
+- name: Build command arguments
+  ansible.builtin.set_fact:
+    typesense_command: >-
+      --data-dir /data
+      --api-key={{ typesense_api_key }}
+      {{ '--enable-cors' if typesense_enable_cors else '' }}
+      --log-level={{ typesense_log_level }}
+      --memory-limit={{ typesense_memory_limit }}
+      --max-memory-ratio={{ typesense_max_memory_ratio }}
+      --num_memory_shards={{ typesense_num_memory_shards }}
+      --snapshot-interval={{ typesense_snapshot_interval }}
+      --cache-purge-strategy={{ typesense_cache_purge_strategy }}
+      {{ typesense_extra_command_args | join(' ') }}
+  tags: typesense
+
+- name: Start Typesense container
+  community.docker.docker_container:
+    name: "{{ typesense_container_name }}"
+    image: "{{ typesense_image }}"
+    hostname: "{{ typesense_container_name }}"
+    state: started
+    restart_policy: "{{ typesense_restart_policy }}"
+    command: "{{ typesense_command }}"
+    volumes:
+      - "{{ typesense_data_dir }}:/data"
+    networks: "{{ typesense_networks }}"
+  when: typesense_enabled
+  tags: typesense

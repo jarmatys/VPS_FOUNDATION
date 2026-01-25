@@ -1,0 +1,51 @@
+---
+- name: Validate required variables
+  ansible.builtin.assert:
+    that:
+      - sqlpad_admin_email is defined
+      - sqlpad_admin_email | length > 0
+      - sqlpad_admin_password is defined
+      - sqlpad_admin_password | length >= 8
+    fail_msg: "Required variables: sqlpad_admin_email, sqlpad_admin_password (min 8 characters)"
+  when: sqlpad_enabled | bool
+
+- name: Build network list
+  ansible.builtin.set_fact:
+    sqlpad_networks: "{{ [{'name': sqlpad_network}] + (sqlpad_extra_networks | map('community.general.dict_kw', name='name') | list) }}"
+  tags: sqlpad
+
+- name: Build base environment
+  ansible.builtin.set_fact:
+    sqlpad_base_env:
+      SQLPAD_ADMIN: "{{ sqlpad_admin_email }}"
+      SQLPAD_ADMIN_PASSWORD: "{{ sqlpad_admin_password }}"
+      SQLPAD_APP_LOG_LEVEL: "{{ sqlpad_app_log_level }}"
+      SQLPAD_WEB_LOG_LEVEL: "{{ sqlpad_web_log_level }}"
+  tags: sqlpad
+
+- name: Build connection environment variables
+  ansible.builtin.set_fact:
+    sqlpad_connection_env: >-
+      {{
+        sqlpad_connections | dict2items | map('regex_replace', '^(.*)$', '') | list | zip_longest([]) | list | first | default({})
+        if sqlpad_connections | length == 0 else
+        sqlpad_connections | dict2items | map(attribute='value') | map('dict2items') | sum(start=[])
+        | map('combine', {'conn_prefix': ''}) | list | json_query('[].{key: join(``, [conn_prefix, key]), value: value}')
+        | items2dict | default({})
+      }}
+  tags: sqlpad
+  when: false
+
+- name: Start SQLPad container
+  community.docker.docker_container:
+    name: "{{ sqlpad_container_name }}"
+    image: "{{ sqlpad_image }}"
+    hostname: "{{ sqlpad_container_name }}"
+    state: started
+    restart_policy: "{{ sqlpad_restart_policy }}"
+    env: "{{ sqlpad_base_env | combine(sqlpad_connections) | combine(sqlpad_extra_env) }}"
+    volumes:
+      - sqlpad_data:/var/lib/sqlpad
+    networks: "{{ sqlpad_networks }}"
+  when: sqlpad_enabled
+  tags: sqlpad

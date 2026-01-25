@@ -1,5 +1,5 @@
 ---
-caddy_enabled: true
+caddy_enabled: false
 caddy_container_name: caddy
 caddy_image: caddy:2-alpine
 caddy_image_cloudflare: ghcr.io/caddybuilds/caddy-cloudflare:latest

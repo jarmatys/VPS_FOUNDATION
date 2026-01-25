@@ -1,0 +1,18 @@
+---
+sqlpad_enabled: false
+sqlpad_container_name: sqlpad
+sqlpad_image: sqlpad/sqlpad:5
+sqlpad_restart_policy: always
+
+sqlpad_admin_email: ""
+sqlpad_admin_password: ""
+
+sqlpad_app_log_level: info
+sqlpad_web_log_level: warn
+
+sqlpad_network: app-network
+sqlpad_extra_networks: []
+
+sqlpad_connections: {}
+
+sqlpad_extra_env: {}
