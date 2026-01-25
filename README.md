@@ -23,9 +23,9 @@ collections:
 |------|-------------|
 | `system_hardening` | System hardening (SSH, firewall, fail2ban, users) |
 | `docker_engine` | Docker and Docker Compose installation |
-| `postgres` | PostgreSQL container deployment |
+| `postgres` | PostgreSQL container deployment (with optional init scripts) |
 | `mssql` | Microsoft SQL Server container deployment |
-| `rabbitmq` | RabbitMQ container with management UI |
+| `rabbitmq` | RabbitMQ container with management UI (with optional config) |
 | `caddy` | Caddy reverse proxy (with optional Cloudflare) |
 | `seq` | Seq logging server |
 | `portainer` | Portainer CE for Docker management |
@@ -52,6 +52,8 @@ collections:
     postgres_db: myproject_db
     postgres_user: myproject
     postgres_password: "{{ lookup('env', 'POSTGRES_PASSWORD') }}"
+    postgres_init_script_path: "{{ playbook_dir }}/files/init.sql"
+    rabbitmq_config_path: "{{ playbook_dir }}/files/rabbitmq.conf"
     services_mssql_enabled: true
     mssql_sa_password: "{{ lookup('env', 'MSSQL_SA_PASSWORD') }}"
     services_seq_enabled: true
