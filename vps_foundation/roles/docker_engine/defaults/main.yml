@@ -43,6 +43,7 @@ docker_dependencies:
   - gnupg
   - lsb-release
   - software-properties-common
+  - python3-docker
 
 docker_networks: []
 docker_registries: []

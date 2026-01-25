@@ -38,7 +38,7 @@ vps_fail2ban_jails:
     port: "{{ vps_ssh_port }}"
     filter: sshd
     logpath: /var/log/auth.log
-    maxretry: 3
+    maxretry: 20
     bantime: 7200
 
 vps_base_packages:
