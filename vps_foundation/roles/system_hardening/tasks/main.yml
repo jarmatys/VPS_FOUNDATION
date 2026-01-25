@@ -4,7 +4,11 @@
     that:
       - vps_app_user is defined
       - vps_app_user | length > 0
-    fail_msg: "Required variable 'vps_app_user' must be defined"
+      - vps_timezone is defined
+      - vps_timezone | length > 0
+      - vps_locale is defined
+      - vps_locale | length > 0
+    fail_msg: "Required variables 'vps_app_user', 'vps_timezone', and 'vps_locale' must be defined"
 
 - name: Include system update tasks
   ansible.builtin.include_tasks: system.yml
