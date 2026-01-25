@@ -35,6 +35,7 @@
     name: "{{ caddy_container_name }}"
     image: "{{ caddy_final_image }}"
     state: started
+    recreate: true
     restart_policy: "{{ caddy_restart_policy }}"
     ports: "{{ caddy_ports }}"
     env: "{{ {'CLOUDFLARE_API_TOKEN': caddy_cloudflare_token} | combine(caddy_extra_env) if caddy_use_cloudflare else caddy_extra_env }}"
@@ -52,6 +53,7 @@
     name: "{{ caddy_container_name }}"
     image: "{{ caddy_final_image }}"
     state: started
+    recreate: true
     restart_policy: "{{ caddy_restart_policy }}"
     ports: "{{ caddy_ports }}"
     env: "{{ {'CLOUDFLARE_API_TOKEN': caddy_cloudflare_token} | combine(caddy_extra_env) if caddy_use_cloudflare else caddy_extra_env }}"

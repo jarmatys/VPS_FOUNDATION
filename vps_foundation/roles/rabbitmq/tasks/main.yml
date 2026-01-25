@@ -28,6 +28,7 @@
     name: "{{ rabbitmq_container_name }}"
     image: "{{ rabbitmq_image }}"
     state: started
+    recreate: true
     restart_policy: "{{ rabbitmq_restart_policy }}"
     env:
       RABBITMQ_DEFAULT_USER: "{{ rabbitmq_user }}"
@@ -50,6 +51,7 @@
     name: "{{ rabbitmq_container_name }}"
     image: "{{ rabbitmq_image }}"
     state: started
+    recreate: true
     restart_policy: "{{ rabbitmq_restart_policy }}"
     env:
       RABBITMQ_DEFAULT_USER: "{{ rabbitmq_user }}"

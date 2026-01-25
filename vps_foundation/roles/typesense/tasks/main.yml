@@ -40,6 +40,7 @@
     image: "{{ typesense_image }}"
     hostname: "{{ typesense_container_name }}"
     state: started
+    recreate: true
     restart_policy: "{{ typesense_restart_policy }}"
     command: "{{ typesense_command }}"
     volumes:

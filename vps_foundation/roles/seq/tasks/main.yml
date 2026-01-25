@@ -4,6 +4,7 @@
     name: "{{ seq_container_name }}"
     image: "{{ seq_image }}"
     state: started
+    recreate: true
     restart_policy: "{{ seq_restart_policy }}"
     env:
       ACCEPT_EULA: "{{ 'Y' if seq_accept_eula else 'N' }}"

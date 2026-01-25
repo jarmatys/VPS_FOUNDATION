@@ -28,6 +28,7 @@
     image: "{{ mssql_image }}"
     hostname: "{{ mssql_container_name }}"
     state: started
+    recreate: true
     restart_policy: "{{ mssql_restart_policy }}"
     env: "{{ {'ACCEPT_EULA': 'Y', 'SA_PASSWORD': mssql_sa_password} | combine(mssql_extra_env) }}"
     volumes:

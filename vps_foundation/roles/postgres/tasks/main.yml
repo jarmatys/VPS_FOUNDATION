@@ -36,6 +36,7 @@
     name: "{{ postgres_container_name }}"
     image: "{{ postgres_image }}"
     state: started
+    recreate: true
     restart_policy: "{{ postgres_restart_policy }}"
     env:
       POSTGRES_DB: "{{ postgres_db }}"
@@ -59,6 +60,7 @@
     name: "{{ postgres_container_name }}"
     image: "{{ postgres_image }}"
     state: started
+    recreate: true
     restart_policy: "{{ postgres_restart_policy }}"
     env:
       POSTGRES_DB: "{{ postgres_db }}"
@@ -91,6 +93,7 @@
     name: "{{ pgadmin_container_name }}"
     image: "{{ pgadmin_image }}"
     state: started
+    recreate: true
     restart_policy: "{{ postgres_restart_policy }}"
     env:
       PGADMIN_DEFAULT_EMAIL: "{{ pgadmin_email }}"

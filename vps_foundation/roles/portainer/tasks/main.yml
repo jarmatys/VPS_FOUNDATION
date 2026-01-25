@@ -4,6 +4,7 @@
     name: "{{ portainer_container_name }}"
     image: "{{ portainer_image }}"
     state: started
+    recreate: true
     restart_policy: "{{ portainer_restart_policy }}"
     env: "{{ {'VIRTUAL_HOST': portainer_vhost, 'VIRTUAL_PORT': '9000'} | combine(portainer_extra_env) if portainer_vhost else portainer_extra_env }}"
     volumes:

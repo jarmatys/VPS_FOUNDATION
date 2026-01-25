@@ -42,6 +42,7 @@
     image: "{{ sqlpad_image }}"
     hostname: "{{ sqlpad_container_name }}"
     state: started
+    recreate: true
     restart_policy: "{{ sqlpad_restart_policy }}"
     env: "{{ sqlpad_base_env | combine(sqlpad_connections) | combine(sqlpad_extra_env) }}"
     volumes:
