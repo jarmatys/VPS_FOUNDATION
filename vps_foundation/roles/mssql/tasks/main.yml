@@ -11,7 +11,10 @@
   ansible.builtin.file:
     path: "{{ mssql_data_dir }}"
     state: directory
+    owner: '10001'
+    group: '0'
     mode: '0755'
+  when: mssql_enabled | bool
   tags: mssql
 
 - name: Build network list
