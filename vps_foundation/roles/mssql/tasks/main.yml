@@ -39,7 +39,9 @@
       timeout: 5s
       retries: 5
       start_period: 30s
-  when: mssql_enabled
+    comparisons:
+      healthcheck: strict
+  when: mssql_enabled | bool
   tags: mssql
 
 - name: Wait for MSSQL to be ready
