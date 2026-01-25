@@ -34,3 +34,5 @@
           - "VPS Bootstrap completed successfully!"
           - "User '{{ vps_app_user }}' created with Docker access"
           - "SSH hardened, firewall enabled, fail2ban configured"
+          - ""
+          - "IMPORTANT: From now on, login using '{{ vps_app_user }}' instead of 'ubuntu' or 'root'"

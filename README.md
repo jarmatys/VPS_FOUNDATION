@@ -93,6 +93,10 @@ ansible-playbook -i inventory/dev.yml playbooks/setup.yml
 - Ubuntu 22.04+ (jammy, noble)
 - Collections: `community.docker`, `community.general`, `ansible.posix`
 
+## Important
+
+After running `vps_bootstrap`, login using the `vps_app_user` account instead of the default `ubuntu` or `root` from your provider.
+
 ## License
 
 MIT
