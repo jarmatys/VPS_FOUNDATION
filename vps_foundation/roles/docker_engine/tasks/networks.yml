@@ -1,14 +1,20 @@
 ---
+- name: Check existing Docker networks
+  ansible.builtin.command:
+    cmd: docker network ls --format '{{ '{{' }}.Name{{ '}}' }}'
+  register: existing_networks
+  changed_when: false
+  tags: networks
+
 - name: Create Docker networks
-  community.docker.docker_network:
-    name: "{{ item.name }}"
-    driver: "{{ item.driver | default('bridge') }}"
-    state: present
+  ansible.builtin.command:
+    cmd: docker network create --driver {{ item.driver | default('bridge') }} {{ item.name }}
   loop: "{{ docker_networks }}"
+  when: item.name not in existing_networks.stdout_lines
   tags: networks
 
 - name: Display created networks
   ansible.builtin.debug:
-    msg: "Created Docker network: {{ item.name }}"
+    msg: "Docker network '{{ item.name }}' is configured"
   loop: "{{ docker_networks }}"
   tags: networks
