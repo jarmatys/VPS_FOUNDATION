@@ -51,11 +51,11 @@
 
 - name: Set SSH public key from prompt
   ansible.builtin.set_fact:
-    vps_app_user_ssh_public_key: "{{ ssh_key_prompt.user_input }}"
+    vps_app_user_ssh_public_key: "{{ ssh_key_prompt.user_input | trim }}"
   when:
     - ssh_key_prompt is defined
     - ssh_key_prompt.user_input is defined
-    - ssh_key_prompt.user_input | length > 0
+    - ssh_key_prompt.user_input | trim | length > 0
   tags: users
 
 - name: Validate SSH key is provided before continuing
