@@ -18,6 +18,7 @@
 
 - name: Display Docker user test result
   ansible.builtin.debug:
-    msg: "User '{{ vps_app_user }}' can successfully run Docker commands"
-  when: docker_user_test.rc == 0
+    msg: "User '{{ item.item }}' can successfully run Docker commands"
+  loop: "{{ docker_user_test.results }}"
+  when: item.rc == 0
   tags: docker
