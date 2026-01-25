@@ -31,10 +31,11 @@
       - "{{ mssql_data_dir }}:/var/opt/mssql/data"
     networks: "{{ mssql_networks }}"
     healthcheck:
-      test: ["/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "{{ mssql_sa_password }}", "-Q", "SELECT 1"]
+      test: ["/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "{{ mssql_sa_password }}", "-C", "-Q", "SELECT 1"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
   when: mssql_enabled
   tags: mssql
 
@@ -42,7 +43,7 @@
   community.docker.docker_container_info:
     name: "{{ mssql_container_name }}"
   register: mssql_info
-  until: mssql_info.container.State.Health.Status == "healthy"
+  until: mssql_info.container.State.Health.Status | default('starting') == "healthy"
   retries: 30
   delay: 5
   when: mssql_enabled
