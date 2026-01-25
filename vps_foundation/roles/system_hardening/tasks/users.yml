@@ -26,12 +26,59 @@
     mode: '0700'
   tags: users
 
-- name: Copy SSH authorized keys from root (if exists)
-  ansible.builtin.command: cp /root/.ssh/authorized_keys {{ vps_app_user_home }}/.ssh/authorized_keys
-  args:
-    creates: "{{ vps_app_user_home }}/.ssh/authorized_keys"
-  ignore_errors: true
-  notify: fix ssh key permissions
+- name: Check if authorized_keys already exists
+  ansible.builtin.stat:
+    path: "{{ vps_app_user_home }}/.ssh/authorized_keys"
+  register: authorized_keys_file
+  tags: users
+
+- name: Prompt for SSH public key if not provided
+  ansible.builtin.pause:
+    prompt: |
+
+      ================================================================================
+      SSH PUBLIC KEY REQUIRED
+      ================================================================================
+      Password authentication will be disabled after this playbook runs.
+
+      Please paste your SSH PUBLIC key (starts with 'ssh-rsa', 'ssh-ed25519', etc.):
+  register: ssh_key_prompt
+  when:
+    - vps_prompt_for_ssh_key | bool
+    - vps_app_user_ssh_public_key | length == 0
+    - not authorized_keys_file.stat.exists
+  tags: users
+
+- name: Set SSH public key from prompt
+  ansible.builtin.set_fact:
+    vps_app_user_ssh_public_key: "{{ ssh_key_prompt.user_input }}"
+  when:
+    - ssh_key_prompt is defined
+    - ssh_key_prompt.user_input is defined
+    - ssh_key_prompt.user_input | length > 0
+  tags: users
+
+- name: Validate SSH key is provided before continuing
+  ansible.builtin.fail:
+    msg: |
+      No SSH public key provided!
+      You must provide an SSH public key via:
+        - vps_app_user_ssh_public_key variable, OR
+        - Interactive prompt during playbook run
+
+      Without an SSH key, you will be locked out of the server!
+  when:
+    - vps_app_user_ssh_public_key | length == 0
+    - not authorized_keys_file.stat.exists
+  tags: users
+
+- name: Add SSH public key for application user
+  ansible.posix.authorized_key:
+    user: "{{ vps_app_user }}"
+    key: "{{ vps_app_user_ssh_public_key }}"
+    state: present
+    exclusive: false
+  when: vps_app_user_ssh_public_key | length > 0
   tags: users
 
 - name: Set up passwordless sudo for application user
