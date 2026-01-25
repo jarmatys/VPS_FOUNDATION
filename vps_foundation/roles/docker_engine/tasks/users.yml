@@ -7,16 +7,13 @@
   loop: "{{ docker_users + docker_additional_users }}"
   tags: docker
 
-- name: Reset SSH connection to allow user changes to take effect
-  ansible.builtin.meta: reset_connection
-  tags: docker
-
 - name: Verify user can run Docker commands
-  ansible.builtin.command: docker ps
+  ansible.builtin.command: sg docker -c "docker ps"
   become: true
-  become_user: "{{ vps_app_user }}"
+  become_user: "{{ item }}"
   register: docker_user_test
   changed_when: false
+  loop: "{{ docker_users + docker_additional_users }}"
   tags: docker
 
 - name: Display Docker user test result
