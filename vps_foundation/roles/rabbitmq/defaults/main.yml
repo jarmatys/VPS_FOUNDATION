@@ -9,3 +9,5 @@ rabbitmq_password: "{{ rabbitmq_password }}"
 
 rabbitmq_network: app-network
 rabbitmq_extra_env: {}
+
+rabbitmq_config_path: ""

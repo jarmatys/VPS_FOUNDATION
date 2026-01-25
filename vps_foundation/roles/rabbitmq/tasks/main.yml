@@ -7,7 +7,45 @@
     fail_msg: "Required variables: rabbitmq_user, rabbitmq_password"
   when: rabbitmq_enabled | bool
 
-- name: Start RabbitMQ container
+- name: Create RabbitMQ config directory
+  ansible.builtin.file:
+    path: /opt/services/rabbitmq/config
+    state: directory
+    mode: '0755'
+  when: rabbitmq_config_path != ""
+  tags: rabbitmq
+
+- name: Copy RabbitMQ config
+  ansible.builtin.copy:
+    src: "{{ rabbitmq_config_path }}"
+    dest: /opt/services/rabbitmq/config/rabbitmq.conf
+    mode: '0644'
+  when: rabbitmq_config_path != ""
+  tags: rabbitmq
+
+- name: Start RabbitMQ container (with config)
+  community.docker.docker_container:
+    name: "{{ rabbitmq_container_name }}"
+    image: "{{ rabbitmq_image }}"
+    state: started
+    restart_policy: "{{ rabbitmq_restart_policy }}"
+    env:
+      RABBITMQ_DEFAULT_USER: "{{ rabbitmq_user }}"
+      RABBITMQ_DEFAULT_PASS: "{{ rabbitmq_password }}"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+      - /opt/services/rabbitmq/config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+    networks:
+      - name: "{{ rabbitmq_network }}"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  when: rabbitmq_enabled and rabbitmq_config_path != ""
+  tags: rabbitmq
+
+- name: Start RabbitMQ container (without config)
   community.docker.docker_container:
     name: "{{ rabbitmq_container_name }}"
     image: "{{ rabbitmq_image }}"
@@ -25,7 +63,7 @@
       interval: 30s
       timeout: 10s
       retries: 5
-  when: rabbitmq_enabled
+  when: rabbitmq_enabled and rabbitmq_config_path == ""
   tags: rabbitmq
 
 - name: Wait for RabbitMQ to be ready

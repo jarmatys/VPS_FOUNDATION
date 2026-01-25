@@ -15,7 +15,46 @@
     mode: '0755'
   tags: postgres
 
-- name: Start PostgreSQL container
+- name: Create PostgreSQL init directory
+  ansible.builtin.file:
+    path: /opt/services/postgres/init
+    state: directory
+    mode: '0755'
+  when: postgres_init_script_path != ""
+  tags: postgres
+
+- name: Copy init script
+  ansible.builtin.copy:
+    src: "{{ postgres_init_script_path }}"
+    dest: /opt/services/postgres/init/init-db.sql
+    mode: '0644'
+  when: postgres_init_script_path != ""
+  tags: postgres
+
+- name: Start PostgreSQL container (with init script)
+  community.docker.docker_container:
+    name: "{{ postgres_container_name }}"
+    image: "{{ postgres_image }}"
+    state: started
+    restart_policy: "{{ postgres_restart_policy }}"
+    env:
+      POSTGRES_DB: "{{ postgres_db }}"
+      POSTGRES_USER: "{{ postgres_user }}"
+      POSTGRES_PASSWORD: "{{ postgres_password }}"
+    volumes:
+      - "{{ postgres_data_dir }}:/var/lib/postgresql/data"
+      - "/opt/services/postgres/init:/docker-entrypoint-initdb.d:ro"
+    networks:
+      - name: "{{ postgres_network }}"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U {{ postgres_user }} -d {{ postgres_db }}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  when: postgres_enabled and postgres_init_script_path != ""
+  tags: postgres
+
+- name: Start PostgreSQL container (without init script)
   community.docker.docker_container:
     name: "{{ postgres_container_name }}"
     image: "{{ postgres_image }}"
@@ -34,7 +73,7 @@
       interval: 10s
       timeout: 5s
       retries: 5
-  when: postgres_enabled
+  when: postgres_enabled and postgres_init_script_path == ""
   tags: postgres
 
 - name: Wait for PostgreSQL to be ready

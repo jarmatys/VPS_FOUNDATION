@@ -13,6 +13,8 @@ postgres_network: app-network
 
 postgres_extra_env: {}
 
+postgres_init_script_path: ""
+
 pgadmin_enabled: false
 pgadmin_container_name: pgadmin
 pgadmin_image: dpage/pgadmin4:latest
