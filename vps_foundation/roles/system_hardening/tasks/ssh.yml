@@ -1,4 +1,35 @@
 ---
+- name: Verify authorized_keys exists for app user before hardening SSH
+  ansible.builtin.stat:
+    path: "{{ vps_app_user_home }}/.ssh/authorized_keys"
+  register: app_user_auth_keys
+  tags: ssh
+
+- name: Fail if no authorized_keys for app user
+  ansible.builtin.fail:
+    msg: |
+      CRITICAL: No authorized_keys file found for {{ vps_app_user }}!
+      Path: {{ vps_app_user_home }}/.ssh/authorized_keys
+      Cannot proceed with SSH hardening - you would be locked out!
+  when: not app_user_auth_keys.stat.exists
+  tags: ssh
+
+- name: Verify authorized_keys has valid SSH key
+  ansible.builtin.shell:
+    cmd: "grep -E '^(ssh-rsa|ssh-ed25519|ecdsa-sha2)' {{ vps_app_user_home }}/.ssh/authorized_keys | wc -l"
+  register: valid_keys_count
+  changed_when: false
+  tags: ssh
+
+- name: Fail if no valid SSH keys found
+  ansible.builtin.fail:
+    msg: |
+      CRITICAL: No valid SSH keys found in {{ vps_app_user_home }}/.ssh/authorized_keys!
+      Found {{ valid_keys_count.stdout | trim }} valid keys.
+      Cannot proceed with SSH hardening - you would be locked out!
+  when: valid_keys_count.stdout | trim | int < 1
+  tags: ssh
+
 - name: Backup original SSH config
   ansible.builtin.copy:
     src: /etc/ssh/sshd_config
