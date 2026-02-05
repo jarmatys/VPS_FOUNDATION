@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-02-05
+
+### Added
+- RabbitMQ plugins support for enabling custom plugins in container
+- Resource configuration options (memory limits, CPU) for various services
+- Recreate option to container tasks for all services
+- SQLPad role for SQL query tool
+- Typesense role for search engine
+- Microsoft SQL Server (MSSQL) role
+- PostgreSQL initialization scripts support
+- RabbitMQ configuration file support
+
+### Changed
+- Increased fail2ban maxretry limit for SSH from 3 to 20
+- Enhanced SSH hardening with authorized_keys verification
+- Updated MSSQL healthcheck command to use CMD format for improved compatibility
+- Improved Docker network creation with existing network check
+
+### Fixed
+- MSSQL container strict healthcheck comparison
+- MSSQL directory ownership and group for data directory
+- SSH public key input trimming for proper validation
+
 ## [1.0.2] - 2025-01-23
 
 ### Fixed
