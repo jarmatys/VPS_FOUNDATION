@@ -43,6 +43,9 @@
       interval: 30s
       timeout: 10s
       retries: 5
+    memory: "{{ rabbitmq_memory_limit | default(omit, true) }}"
+    memory_reservation: "{{ rabbitmq_memory_reservation | default(omit, true) }}"
+    cpus: "{{ rabbitmq_cpus | default(omit, true) }}"
   when: rabbitmq_enabled and rabbitmq_config_path != ""
   tags: rabbitmq
 
@@ -65,6 +68,9 @@
       interval: 30s
       timeout: 10s
       retries: 5
+    memory: "{{ rabbitmq_memory_limit | default(omit, true) }}"
+    memory_reservation: "{{ rabbitmq_memory_reservation | default(omit, true) }}"
+    cpus: "{{ rabbitmq_cpus | default(omit, true) }}"
   when: rabbitmq_enabled and rabbitmq_config_path == ""
   tags: rabbitmq
 

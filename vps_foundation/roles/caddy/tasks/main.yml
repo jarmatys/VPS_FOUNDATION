@@ -45,6 +45,9 @@
       - /opt/services/caddy/config/Caddyfile:/etc/caddy/Caddyfile:ro
     networks:
       - name: "{{ caddy_network }}"
+    memory: "{{ caddy_memory_limit | default(omit, true) }}"
+    memory_reservation: "{{ caddy_memory_reservation | default(omit, true) }}"
+    cpus: "{{ caddy_cpus | default(omit, true) }}"
   when: caddy_enabled and caddy_config_path != ""
   tags: caddy
 
@@ -62,5 +65,8 @@
       - caddy_config:/config
     networks:
       - name: "{{ caddy_network }}"
+    memory: "{{ caddy_memory_limit | default(omit, true) }}"
+    memory_reservation: "{{ caddy_memory_reservation | default(omit, true) }}"
+    cpus: "{{ caddy_cpus | default(omit, true) }}"
   when: caddy_enabled and caddy_config_path == ""
   tags: caddy

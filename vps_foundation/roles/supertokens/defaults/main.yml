@@ -11,3 +11,7 @@ supertokens_postgres_host: postgres
 supertokens_postgres_port: 5432
 postgres_user: "{{ postgres_user }}"
 postgres_password: "{{ postgres_password }}"
+
+supertokens_memory_limit: ""
+supertokens_memory_reservation: ""
+supertokens_cpus: ""

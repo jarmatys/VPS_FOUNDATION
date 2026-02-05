@@ -52,6 +52,9 @@
       interval: 10s
       timeout: 5s
       retries: 5
+    memory: "{{ postgres_memory_limit | default(omit, true) }}"
+    memory_reservation: "{{ postgres_memory_reservation | default(omit, true) }}"
+    cpus: "{{ postgres_cpus | default(omit, true) }}"
   when: postgres_enabled and postgres_init_script_path != ""
   tags: postgres
 
@@ -75,6 +78,9 @@
       interval: 10s
       timeout: 5s
       retries: 5
+    memory: "{{ postgres_memory_limit | default(omit, true) }}"
+    memory_reservation: "{{ postgres_memory_reservation | default(omit, true) }}"
+    cpus: "{{ postgres_cpus | default(omit, true) }}"
   when: postgres_enabled and postgres_init_script_path == ""
   tags: postgres
 
@@ -104,5 +110,8 @@
       - pgadmin_data:/var/lib/pgadmin
     networks:
       - name: "{{ postgres_network }}"
+    memory: "{{ pgadmin_memory_limit | default(omit, true) }}"
+    memory_reservation: "{{ pgadmin_memory_reservation | default(omit, true) }}"
+    cpus: "{{ pgadmin_cpus | default(omit, true) }}"
   when: pgadmin_enabled
   tags: postgres

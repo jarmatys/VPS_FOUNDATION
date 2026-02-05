@@ -42,6 +42,9 @@
       start_period: 30s
     comparisons:
       healthcheck: strict
+    memory: "{{ mssql_memory_limit | default(omit, true) }}"
+    memory_reservation: "{{ mssql_memory_reservation | default(omit, true) }}"
+    cpus: "{{ mssql_cpus | default(omit, true) }}"
   when: mssql_enabled | bool
   tags: mssql
 

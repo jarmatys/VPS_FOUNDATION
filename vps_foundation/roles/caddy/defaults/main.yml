@@ -16,3 +16,7 @@ caddy_ports:
   - "443:443"
 
 caddy_extra_env: {}
+
+caddy_memory_limit: ""
+caddy_memory_reservation: ""
+caddy_cpus: ""

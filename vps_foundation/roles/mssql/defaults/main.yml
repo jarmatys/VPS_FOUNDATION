@@ -12,3 +12,7 @@ mssql_network: app-network
 mssql_extra_networks: []
 
 mssql_extra_env: {}
+
+mssql_memory_limit: ""
+mssql_memory_reservation: ""
+mssql_cpus: ""

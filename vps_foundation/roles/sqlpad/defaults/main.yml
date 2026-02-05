@@ -16,3 +16,7 @@ sqlpad_extra_networks: []
 sqlpad_connections: {}
 
 sqlpad_extra_env: {}
+
+sqlpad_memory_limit: ""
+sqlpad_memory_reservation: ""
+sqlpad_cpus: ""

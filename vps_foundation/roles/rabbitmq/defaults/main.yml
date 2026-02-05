@@ -11,3 +11,7 @@ rabbitmq_network: app-network
 rabbitmq_extra_env: {}
 
 rabbitmq_config_path: ""
+
+rabbitmq_memory_limit: ""
+rabbitmq_memory_reservation: ""
+rabbitmq_cpus: ""

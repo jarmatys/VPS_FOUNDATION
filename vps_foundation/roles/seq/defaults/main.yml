@@ -9,3 +9,7 @@ seq_accept_eula: true
 seq_first_run_no_auth: true
 
 seq_extra_env: {}
+
+seq_memory_limit: ""
+seq_memory_reservation: ""
+seq_cpus: ""

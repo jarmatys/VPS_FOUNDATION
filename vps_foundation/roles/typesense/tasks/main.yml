@@ -46,5 +46,8 @@
     volumes:
       - "{{ typesense_data_dir }}:/data"
     networks: "{{ typesense_networks }}"
+    memory: "{{ typesense_docker_memory_limit | default(omit, true) }}"
+    memory_reservation: "{{ typesense_docker_memory_reservation | default(omit, true) }}"
+    cpus: "{{ typesense_docker_cpus | default(omit, true) }}"
   when: typesense_enabled
   tags: typesense

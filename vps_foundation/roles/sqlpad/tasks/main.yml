@@ -48,5 +48,8 @@
     volumes:
       - sqlpad_data:/var/lib/sqlpad
     networks: "{{ sqlpad_networks }}"
+    memory: "{{ sqlpad_memory_limit | default(omit, true) }}"
+    memory_reservation: "{{ sqlpad_memory_reservation | default(omit, true) }}"
+    cpus: "{{ sqlpad_cpus | default(omit, true) }}"
   when: sqlpad_enabled
   tags: sqlpad

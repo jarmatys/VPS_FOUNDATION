@@ -15,8 +15,15 @@ postgres_extra_env: {}
 
 postgres_init_script_path: ""
 
+postgres_memory_limit: ""
+postgres_memory_reservation: ""
+postgres_cpus: ""
+
 pgadmin_enabled: false
 pgadmin_container_name: pgadmin
 pgadmin_image: dpage/pgadmin4:latest
 pgadmin_email: "{{ pgadmin_email | default('admin@example.com') }}"
 pgadmin_password: "{{ pgadmin_password | default('admin') }}"
+pgadmin_memory_limit: ""
+pgadmin_memory_reservation: ""
+pgadmin_cpus: ""

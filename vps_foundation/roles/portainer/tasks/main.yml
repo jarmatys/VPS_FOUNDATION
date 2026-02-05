@@ -12,5 +12,8 @@
       - portainer_data:/data
     networks:
       - name: "{{ portainer_network }}"
+    memory: "{{ portainer_memory_limit | default(omit, true) }}"
+    memory_reservation: "{{ portainer_memory_reservation | default(omit, true) }}"
+    cpus: "{{ portainer_cpus | default(omit, true) }}"
   when: portainer_enabled
   tags: portainer

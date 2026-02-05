@@ -13,5 +13,8 @@
       - seq_data:/data
     networks:
       - name: "{{ seq_network }}"
+    memory: "{{ seq_memory_limit | default(omit, true) }}"
+    memory_reservation: "{{ seq_memory_reservation | default(omit, true) }}"
+    cpus: "{{ seq_cpus | default(omit, true) }}"
   when: seq_enabled
   tags: seq

@@ -8,3 +8,7 @@ portainer_network: app-network
 portainer_vhost: ""
 
 portainer_extra_env: {}
+
+portainer_memory_limit: ""
+portainer_memory_reservation: ""
+portainer_cpus: ""

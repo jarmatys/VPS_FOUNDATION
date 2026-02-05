@@ -19,3 +19,7 @@ typesense_snapshot_interval: 1800
 typesense_cache_purge_strategy: background
 
 typesense_extra_command_args: []
+
+typesense_docker_memory_limit: ""
+typesense_docker_memory_reservation: ""
+typesense_docker_cpus: ""

@@ -21,6 +21,9 @@
       API_KEYS: "{{ supertokens_api_keys }}"
     networks:
       - name: "{{ supertokens_network }}"
+    memory: "{{ supertokens_memory_limit | default(omit, true) }}"
+    memory_reservation: "{{ supertokens_memory_reservation | default(omit, true) }}"
+    cpus: "{{ supertokens_cpus | default(omit, true) }}"
   when: supertokens_enabled
   tags: supertokens
 
