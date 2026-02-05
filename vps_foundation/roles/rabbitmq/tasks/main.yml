@@ -74,6 +74,13 @@
   when: rabbitmq_enabled and rabbitmq_config_path == ""
   tags: rabbitmq
 
+- name: Enable RabbitMQ plugins
+  community.docker.docker_container_exec:
+    container: "{{ rabbitmq_container_name }}"
+    command: rabbitmq-plugins enable {{ rabbitmq_plugins | join(' ') }}
+  when: rabbitmq_enabled | bool and rabbitmq_plugins | length > 0
+  tags: rabbitmq
+
 - name: Wait for RabbitMQ to be ready
   community.docker.docker_container_info:
     name: "{{ rabbitmq_container_name }}"
