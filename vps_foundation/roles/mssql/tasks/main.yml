@@ -57,3 +57,15 @@
   delay: 5
   when: mssql_enabled
   tags: mssql
+
+- name: Configure SQL Server max memory
+  community.docker.docker_container_exec:
+    container: "{{ mssql_container_name }}"
+    command: >
+      /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P '{{ mssql_sa_password }}' -C -Q
+      "EXEC sp_configure 'show advanced options', 1; RECONFIGURE;
+       EXEC sp_configure 'max server memory', {{ mssql_max_server_memory_mb }}; RECONFIGURE;"
+  when:
+    - mssql_enabled | bool
+    - mssql_max_server_memory_mb | default('', true) | string | length > 0
+  tags: mssql

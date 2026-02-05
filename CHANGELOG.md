@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.0] - 2025-02-05
 
 ### Added
+- MSSQL `mssql_max_server_memory_mb` parameter for configuring SQL Server internal memory limit
 - RabbitMQ plugins support for enabling custom plugins in container
 - Resource configuration options (memory limits, CPU) for various services
 - Recreate option to container tasks for all services

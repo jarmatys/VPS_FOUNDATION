@@ -16,3 +16,5 @@ mssql_extra_env: {}
 mssql_memory_limit: ""
 mssql_memory_reservation: ""
 mssql_cpus: ""
+
+mssql_max_server_memory_mb: ""
