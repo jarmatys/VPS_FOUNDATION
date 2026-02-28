@@ -11,9 +11,7 @@
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
-    owner: root
-    group: root
-    mode: '0750'
+    mode: '0755'
   loop:
     - "{{ backrest_data_dir }}"
     - "{{ backrest_config_dir }}"
@@ -26,9 +24,7 @@
   ansible.builtin.copy:
     src: "{{ backrest_config_path }}"
     dest: "{{ backrest_config_dir }}/config.json"
-    owner: root
-    group: root
-    mode: '0600'
+    mode: '0644'
     force: false
   when:
     - backrest_enabled | bool
